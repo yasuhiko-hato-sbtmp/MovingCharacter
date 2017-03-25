@@ -6,6 +6,8 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     private int REQUEST_OVERLAY_CODE = 100;
@@ -16,6 +18,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //setContentView(new CustomView(this));
+        setContentView(R.layout.activity_main);
+
+        Button start = (Button)findViewById(R.id.start);
+        start.setText("Start");
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkCanDrawOverlays();
+            }
+        });
+        Button stop = (Button)findViewById(R.id.stop);
+        stop.setText("Stop");
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopService(new Intent(MainActivity.this, LayerService.class));
+            }
+        });
+
         checkCanDrawOverlays();
     }
 

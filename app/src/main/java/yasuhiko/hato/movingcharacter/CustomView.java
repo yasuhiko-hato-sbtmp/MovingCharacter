@@ -57,6 +57,7 @@ public class CustomView extends View {
 
     @Override
     protected void onAttachedToWindow(){
+        /*
         Handler handler = new Handler(){
             public void handleMessage(Message msg){
                 //Log.d("onAttachedToWindow", String.format("isAttached=%b", mIsAttached));
@@ -77,7 +78,7 @@ public class CustomView extends View {
         };
         mIsAttached = true;
         handler.sendEmptyMessageDelayed(0, delay_millisec);
-
+*/
         super.onAttachedToWindow();
     }
 
