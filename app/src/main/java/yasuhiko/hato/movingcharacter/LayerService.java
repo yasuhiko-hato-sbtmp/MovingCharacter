@@ -87,9 +87,14 @@ public class LayerService extends Service {
 
                             mWindowManager.updateViewLayout(mView, mParams);
                         //}
+                        mIsLongClick = true;
                     case MotionEvent.ACTION_UP:
-                        mIsLongClick = false;
-                        Log.d(LOG_TAG, "ACTION_UP");
+                        if(mIsLongClick) {
+                            mIsLongClick = false;
+                        }
+                        else{
+                            Log.d(LOG_TAG, "ACTION_UP");
+                        }
                 }
 
                 return false;
@@ -100,7 +105,31 @@ public class LayerService extends Service {
         Log.d(LOG_TAG, "added view");
 
 
-        return START_STICKY;
+//        new Thread(new Runnable(){
+//            public void run(){
+//                int count = 0;
+//                while(true){
+//                    if(count == 1000){
+//                        Log.d(LOG_TAG, "stop");
+//                    }
+//                    else if(count > 1000 && count < 2000){
+//                        Log.d(LOG_TAG, "moving");
+//                        mParams.x += 5;
+//                        mParams.y += 5;
+//                        mWindowManager.updateViewLayout(mView, mParams);
+//
+//                    }
+//                    else if(count == 2000){
+//                        count = 0;
+//                    }
+//                    count++;
+//                }
+//            }
+//        }).start();
+
+
+        //return START_STICKY; // If we get killed, after returning from here, restart
+        return START_NOT_STICKY;
     }
 
     @Override
