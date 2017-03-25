@@ -30,6 +30,8 @@ public class CustomView extends View {
     private float mScreenWidth, mScreenHeight;
     private boolean mIsAttached;
 
+    private boolean mIsDragged = false;
+
     Resources res = this.getContext().getResources();
     Bitmap bell = BitmapFactory.decodeResource(res, R.drawable.robot_head_b);
 
@@ -37,6 +39,12 @@ public class CustomView extends View {
         super(context);
         setFocusable(true);
     }
+
+
+    public void setDraggedStatus(boolean status){
+        mIsDragged = status;
+    }
+
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh){
@@ -57,28 +65,29 @@ public class CustomView extends View {
 
     @Override
     protected void onAttachedToWindow(){
-        /*
+
         Handler handler = new Handler(){
             public void handleMessage(Message msg){
-                //Log.d("onAttachedToWindow", String.format("isAttached=%b", mIsAttached));
-                if (mIsAttached){
-                    if(mXOffset < 0 || mXOffset + IMAGE_WIDTH > mScreenWidth){
-                        mDx = -mDx;
-                    }
-                    if(mYOffset < 0 || mYOffset + IMAGE_HEIGHT > mScreenHeight){
-                        mDy = -mDy;
-                    }
+                if(!mIsDragged) {
+                    if (mIsAttached) {
+                        if (mXOffset < 0 || mXOffset + IMAGE_WIDTH > mScreenWidth) {
+                            mDx = -mDx;
+                        }
+                        if (mYOffset < 0 || mYOffset + IMAGE_HEIGHT > mScreenHeight) {
+                            mDy = -mDy;
+                        }
 
-                    mXOffset += mDx;
-                    mYOffset += mDy;
-                    invalidate();
-                    sendEmptyMessageDelayed(0, delay_millisec);
+                        mXOffset += mDx;
+                        mYOffset += mDy;
+                        invalidate();
+                        sendEmptyMessageDelayed(0, delay_millisec);
+                    }
                 }
             }
         };
         mIsAttached = true;
         handler.sendEmptyMessageDelayed(0, delay_millisec);
-*/
+
         super.onAttachedToWindow();
     }
 

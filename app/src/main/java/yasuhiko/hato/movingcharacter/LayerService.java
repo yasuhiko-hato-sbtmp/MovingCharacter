@@ -75,7 +75,8 @@ public class LayerService extends Service {
                 switch(motionEvent.getAction()) {
                     case MotionEvent.ACTION_MOVE:
                         Log.d(LOG_TAG, "ACTION_MOVE");
-                        if(mIsLongClick) {
+                        //(CustomView)mView.setDraggedStatus(true);
+                        //if(mIsLongClick) {
                             Log.d(LOG_TAG, "ACTION_MOVE, mIsLongClick");
                             Point displaySize = getDisplaySize();
                             int centerX = x - (displaySize.x / 2);
@@ -85,9 +86,10 @@ public class LayerService extends Service {
                             mParams.y = centerY;
 
                             mWindowManager.updateViewLayout(mView, mParams);
-                        }
+                        //}
                     case MotionEvent.ACTION_UP:
                         mIsLongClick = false;
+                        Log.d(LOG_TAG, "ACTION_UP");
                 }
 
                 return false;
