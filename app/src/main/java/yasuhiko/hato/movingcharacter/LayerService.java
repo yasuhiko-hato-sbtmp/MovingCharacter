@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Display;
@@ -21,9 +22,15 @@ import android.view.WindowManager;
 public class LayerService extends Service {
     private final String LOG_TAG = "LayerService";
     private View mView;
+    Point mDisplaySize;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mParams;
-    private boolean mIsLongClick = false;
+    private boolean mThreadFlag = true;
+    private boolean mIsDragged = false;
+    private float mMoveX = 1;
+    private float mMoveY = 1;
+    private float TRAVELING_TIME_MILLI_SEC = 3000;
+    private float STOP_TIME_MILLI_SEC = 5000;
 
     public LayerService() {
     }
@@ -39,6 +46,10 @@ public class LayerService extends Service {
         Log.d(LOG_TAG, "Start");
         super.onStartCommand(intent, flags, startId);
 
+        mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        mDisplaySize = getDisplaySize();
+
+        Log.d(LOG_TAG, String.valueOf(mMoveX) + ", " + String.valueOf(mMoveY));
 
         mParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -50,53 +61,33 @@ public class LayerService extends Service {
                         WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
                 PixelFormat.TRANSLUCENT);
 
-        mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         mView = layoutInflater.inflate(R.layout.overlay, null);
-//        mView = new CustomView(getApplicationContext());
 
-        //DragViewListener dragViewListener = new DragViewListener(mView);
-        //mView.setOnTouchListener(dragViewListener);
-        mView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Log.d(LOG_TAG, "onLongClick");
-                mIsLongClick = true;
-                return false;
-            }
-        });
         mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                Log.d(LOG_TAG, motionEvent.toString());
+
                 int x = (int)motionEvent.getRawX();
                 int y = (int)motionEvent.getRawY();
+                int action = motionEvent.getAction();
 
-                switch(motionEvent.getAction()) {
-                    case MotionEvent.ACTION_MOVE:
-                        Log.d(LOG_TAG, "ACTION_MOVE");
-                        //(CustomView)mView.setDraggedStatus(true);
-                        //if(mIsLongClick) {
-                            Log.d(LOG_TAG, "ACTION_MOVE, mIsLongClick");
-                            Point displaySize = getDisplaySize();
-                            int centerX = x - (displaySize.x / 2);
-                            int centerY = y - (displaySize.y / 2);
+                if(action == MotionEvent.ACTION_MOVE) {
 
-                            mParams.x = centerX;
-                            mParams.y = centerY;
+                    int centerX = x - (mDisplaySize.x / 2);
+                    int centerY = y - (mDisplaySize.y / 2);
 
-                            mWindowManager.updateViewLayout(mView, mParams);
-                        //}
-                        mIsLongClick = true;
-                    case MotionEvent.ACTION_UP:
-                        if(mIsLongClick) {
-                            mIsLongClick = false;
-                        }
-                        else{
-                            Log.d(LOG_TAG, "ACTION_UP");
-                        }
+                    mParams.x = centerX;
+                    mParams.y = centerY;
+
+                    mWindowManager.updateViewLayout(mView, mParams);
+                    mIsDragged = true;
                 }
-
+                else if(action == MotionEvent.ACTION_UP) {
+                    mIsDragged = false;
+                }
                 return false;
             }
         });
@@ -105,27 +96,55 @@ public class LayerService extends Service {
         Log.d(LOG_TAG, "added view");
 
 
-//        new Thread(new Runnable(){
-//            public void run(){
-//                int count = 0;
-//                while(true){
-//                    if(count == 1000){
-//                        Log.d(LOG_TAG, "stop");
-//                    }
-//                    else if(count > 1000 && count < 2000){
-//                        Log.d(LOG_TAG, "moving");
-//                        mParams.x += 5;
-//                        mParams.y += 5;
-//                        mWindowManager.updateViewLayout(mView, mParams);
-//
-//                    }
-//                    else if(count == 2000){
-//                        count = 0;
-//                    }
-//                    count++;
-//                }
-//            }
-//        }).start();
+        final Handler handlerForMove = new Handler();
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+
+                int count = 0;
+                long start = System.currentTimeMillis();
+                while(mThreadFlag) {
+                    long end = System.currentTimeMillis();
+                    long elapsedTime = end - start;
+
+                    if (!mIsDragged) {
+                        if( elapsedTime < STOP_TIME_MILLI_SEC ){
+
+                        }
+                        else if( elapsedTime >= STOP_TIME_MILLI_SEC
+                                && elapsedTime < STOP_TIME_MILLI_SEC + TRAVELING_TIME_MILLI_SEC){
+
+                            if(elapsedTime == STOP_TIME_MILLI_SEC){
+                                Log.d(LOG_TAG, "START Traveling");
+                            }
+
+                            Point displaySize = getDisplaySize();
+                            if(mParams.x < -displaySize.x/2 || mParams.x > displaySize.x/2) {
+                                mMoveX = -mMoveX;
+                            }
+                            if(mParams.y < -displaySize.y/2 || mParams.y > displaySize.y/2){
+                                mMoveY = -mMoveY;
+                            }
+                            mParams.x += mMoveX;
+                            mParams.y += mMoveY;
+
+                            handlerForMove.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mWindowManager.updateViewLayout(mView, mParams);
+                                }
+                            });
+                        }
+                        else{
+                            start = System.currentTimeMillis();
+                            Log.d(LOG_TAG, "STOP Traveling");
+                        }
+                    }
+                }
+                Log.d(LOG_TAG, "Moving thread finished");
+            }
+        }).start();
+
 
 
         //return START_STICKY; // If we get killed, after returning from here, restart
@@ -136,6 +155,7 @@ public class LayerService extends Service {
     public void onDestroy() {
         super.onDestroy();
         mWindowManager.removeView(mView);
+        mThreadFlag = false;
     }
 
     private Point getDisplaySize(){
