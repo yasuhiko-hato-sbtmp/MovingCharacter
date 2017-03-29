@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.media.Image;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -34,6 +33,7 @@ public class LayerService extends Service {
     private float TRAVELING_TIME_MILLI_SEC = 3000;
     private float STOP_TIME_MILLI_SEC = 5000;
     private ImageView mCharacterImageView;
+    final Handler mHandlerForMove = new Handler();
 
     public LayerService() {
     }
@@ -43,6 +43,7 @@ public class LayerService extends Service {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -79,6 +80,13 @@ public class LayerService extends Service {
 
                 if(action == MotionEvent.ACTION_MOVE) {
 
+                    mHandlerForMove.post(new Runnable(){
+                        @Override
+                        public void run() {
+                            mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_u);
+                        }
+                    });
+
                     int centerX = x - (mDisplaySize.x / 2);
                     int centerY = y - (mDisplaySize.y / 2);
 
@@ -90,7 +98,12 @@ public class LayerService extends Service {
                 }
                 else if(action == MotionEvent.ACTION_UP) {
                     mIsDragged = false;
-                    // TODO implement procedure to change the image
+                    mHandlerForMove.post(new Runnable(){
+                        @Override
+                        public void run() {
+                            mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_l);
+                        }
+                    });
                 }
                 return false;
             }
@@ -100,7 +113,7 @@ public class LayerService extends Service {
         Log.d(LOG_TAG, "added view");
 
 
-        final Handler handlerForMove = new Handler();
+
         new Thread(new Runnable(){
             @Override
             public void run() {
@@ -135,7 +148,7 @@ public class LayerService extends Service {
 
                             // set left or right image
                             if(mMoveX < 0){
-                                handlerForMove.post(new Runnable(){
+                                mHandlerForMove.post(new Runnable(){
                                     @Override
                                     public void run() {
                                         mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_l);
@@ -143,7 +156,7 @@ public class LayerService extends Service {
                                 });
                             }
                             else{
-                                handlerForMove.post(new Runnable(){
+                                mHandlerForMove.post(new Runnable(){
                                     @Override
                                     public void run() {
                                         mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_r);
@@ -154,7 +167,7 @@ public class LayerService extends Service {
                             mParams.y += mMoveY;
                             //Log.d(LOG_TAG, String.valueOf(mParams.x) + ", " + String.valueOf(mParams.y));
 
-                            handlerForMove.post(new Runnable() {
+                            mHandlerForMove.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     mWindowManager.updateViewLayout(mView, mParams);
