@@ -19,9 +19,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.overlay);
-        Consts.mImageView = (ImageView)findViewById(R.id.robot);
-
         //setContentView(new CustomView(this));
         setContentView(R.layout.activity_main);
 

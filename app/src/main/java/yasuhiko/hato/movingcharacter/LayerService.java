@@ -5,15 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.view.ViewTreeObserver;
 
 
 /**
@@ -23,6 +26,7 @@ import android.widget.ImageView;
 public class LayerService extends Service {
     private final String LOG_TAG = "LayerService";
     private View mView;
+    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener;
     Point mDisplaySize;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mParams;
@@ -33,6 +37,8 @@ public class LayerService extends Service {
     private float TRAVELING_TIME_MILLI_SEC = 3000;
     private float STOP_TIME_MILLI_SEC = 5000;
     private ImageView mCharacterImageView;
+    private int mImageViewWidth;
+    private int mImageViewHeight;
     final Handler mHandlerForMove = new Handler();
 
     public LayerService() {
@@ -52,7 +58,7 @@ public class LayerService extends Service {
 
         mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         mDisplaySize = getDisplaySize();
-        Log.d(LOG_TAG, mDisplaySize.toString());
+        //Log.d(LOG_TAG, mDisplaySize.toString());
 
         mParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -69,6 +75,19 @@ public class LayerService extends Service {
         mView = layoutInflater.inflate(R.layout.overlay, null);
         mCharacterImageView = (ImageView)mView.findViewById(R.id.robot);
 
+        // get width and height of robot imageView
+        mGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener(){
+            @Override
+            public void onGlobalLayout() {
+                mImageViewWidth = mView.getWidth();
+                mImageViewHeight = mView.getHeight();
+                Log.d(LOG_TAG, "Robot imageView: " + String.valueOf(mImageViewWidth) + " x " + String.valueOf(mImageViewHeight));
+                removeOnGlobalLayoutListener(mView.getViewTreeObserver(), mGlobalLayoutListener);
+            }
+        };
+        mView.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+
+
         mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -79,13 +98,7 @@ public class LayerService extends Service {
                 int action = motionEvent.getAction();
 
                 if(action == MotionEvent.ACTION_MOVE) {
-
-                    mHandlerForMove.post(new Runnable(){
-                        @Override
-                        public void run() {
-                            mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_u);
-                        }
-                    });
+                    changeImageViewImage(R.drawable.robot_head_b_mini_u);
 
                     int centerX = x - (mDisplaySize.x / 2);
                     int centerY = y - (mDisplaySize.y / 2);
@@ -98,19 +111,14 @@ public class LayerService extends Service {
                 }
                 else if(action == MotionEvent.ACTION_UP) {
                     mIsDragged = false;
-                    mHandlerForMove.post(new Runnable(){
-                        @Override
-                        public void run() {
-                            mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_l);
-                        }
-                    });
+                    changeImageViewImage(R.drawable.robot_head_b_mini_l);
                 }
                 return false;
             }
         });
 
         mWindowManager.addView(mView, mParams);
-        Log.d(LOG_TAG, "added view");
+        //Log.d(LOG_TAG, "added view");
 
 
 
@@ -139,29 +147,19 @@ public class LayerService extends Service {
                                 continue;
                             }
 
-                            if(mParams.x < -mDisplaySize.x/2 || mParams.x > mDisplaySize.x/2) {
+                            if(mParams.x - mImageViewWidth/2 < -mDisplaySize.x/2 || mParams.x + mImageViewWidth/2 > mDisplaySize.x/2) {
                                 mMoveX = -mMoveX;
                             }
-                            if(mParams.y < -mDisplaySize.y/2 || mParams.y > mDisplaySize.y/2){
+                            if(mParams.y - mImageViewHeight/2 < -mDisplaySize.y/2 || mParams.y + mImageViewHeight/2 > mDisplaySize.y/2){
                                 mMoveY = -mMoveY;
                             }
 
                             // set left or right image
                             if(mMoveX < 0){
-                                mHandlerForMove.post(new Runnable(){
-                                    @Override
-                                    public void run() {
-                                        mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_l);
-                                    }
-                                });
+                                changeImageViewImage(R.drawable.robot_head_b_mini_l);
                             }
                             else{
-                                mHandlerForMove.post(new Runnable(){
-                                    @Override
-                                    public void run() {
-                                        mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_r);
-                                    }
-                                });
+                                changeImageViewImage(R.drawable.robot_head_b_mini_r);
                             }
                             mParams.x += mMoveX;
                             mParams.y += mMoveY;
@@ -202,5 +200,28 @@ public class LayerService extends Service {
         Point point = new Point();
         display.getSize(point);
         return point;
+    }
+
+
+    private static void removeOnGlobalLayoutListener(ViewTreeObserver observer, ViewTreeObserver.OnGlobalLayoutListener listener) {
+        if (observer == null) {
+            return ;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            observer.removeGlobalOnLayoutListener(listener);
+        } else {
+            observer.removeOnGlobalLayoutListener(listener);
+        }
+    }
+
+
+    private void changeImageViewImage(final int resourceId){
+        mHandlerForMove.post(new Runnable(){
+            @Override
+            public void run() {
+                mCharacterImageView.setImageResource(resourceId);
+            }
+        });
     }
 }
