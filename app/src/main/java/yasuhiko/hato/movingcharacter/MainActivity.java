@@ -6,8 +6,8 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
-import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
     private int REQUEST_OVERLAY_CODE = 100;
@@ -20,27 +20,24 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(new CustomView(this));
         setContentView(R.layout.activity_main);
 
-        Button start = (Button)findViewById(R.id.start);
-        start.setText("Start");
-        start.setOnClickListener(new View.OnClickListener() {
+        Switch presenceSwitch = (Switch)findViewById(R.id.presence_switch);
+        presenceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                checkCanDrawOverlays();
-            }
-        });
-        Button stop = (Button)findViewById(R.id.stop);
-        stop.setText("Stop");
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopService(new Intent(MainActivity.this, LayerService.class));
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    // start moving
+                    checkCanDrawOverlaysAndStartMoving();
+                }
+                else{
+                    // stop moving
+                    stopService(new Intent(MainActivity.this, LayerService.class));
+                }
             }
         });
 
-        checkCanDrawOverlays();
     }
 
-    private void checkCanDrawOverlays(){
+    private void checkCanDrawOverlaysAndStartMoving(){
         if(Build.VERSION.SDK_INT >= 23) {
             if (!Settings.canDrawOverlays(MainActivity.this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -60,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_OVERLAY_CODE){
-            checkCanDrawOverlays();
+            checkCanDrawOverlaysAndStartMoving();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

@@ -8,12 +8,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="yasuhiko.hato.movingcharacter.MainActivity">
 
-    <Button
+    <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/start"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/stop"/>
+        android:id="@+id/presence_switch"/>
+
 </LinearLayout>

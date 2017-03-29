@@ -27,8 +27,8 @@ public class LayerService extends Service {
     private WindowManager.LayoutParams mParams;
     private boolean mThreadFlag = true;
     private boolean mIsDragged = false;
-    private float mMoveX = 1;
-    private float mMoveY = 1;
+    private float mMoveX = 5;
+    private float mMoveY = 5;
     private float TRAVELING_TIME_MILLI_SEC = 3000;
     private float STOP_TIME_MILLI_SEC = 5000;
 
@@ -117,6 +117,10 @@ public class LayerService extends Service {
                             if(elapsedTime == STOP_TIME_MILLI_SEC){
                                 Log.d(LOG_TAG, "START Traveling");
                             }
+                            if(elapsedTime % 100 != 0){
+                                continue;
+                            }
+
 
                             Point displaySize = getDisplaySize();
                             if(mParams.x < -displaySize.x/2 || mParams.x > displaySize.x/2) {
