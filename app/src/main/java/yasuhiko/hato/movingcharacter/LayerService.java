@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.media.Image;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 
 /**
@@ -27,10 +29,11 @@ public class LayerService extends Service {
     private WindowManager.LayoutParams mParams;
     private boolean mThreadFlag = true;
     private boolean mIsDragged = false;
-    private float mMoveX = 5;
-    private float mMoveY = 5;
+    private float mMoveX = 1;
+    private float mMoveY = 1;
     private float TRAVELING_TIME_MILLI_SEC = 3000;
     private float STOP_TIME_MILLI_SEC = 5000;
+    private ImageView mCharacterImageView;
 
     public LayerService() {
     }
@@ -48,8 +51,7 @@ public class LayerService extends Service {
 
         mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         mDisplaySize = getDisplaySize();
-
-        Log.d(LOG_TAG, String.valueOf(mMoveX) + ", " + String.valueOf(mMoveY));
+        Log.d(LOG_TAG, mDisplaySize.toString());
 
         mParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -64,6 +66,7 @@ public class LayerService extends Service {
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         mView = layoutInflater.inflate(R.layout.overlay, null);
+        mCharacterImageView = (ImageView)mView.findViewById(R.id.robot);
 
         mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -87,6 +90,7 @@ public class LayerService extends Service {
                 }
                 else if(action == MotionEvent.ACTION_UP) {
                     mIsDragged = false;
+                    // TODO implement procedure to change the image
                 }
                 return false;
             }
@@ -103,6 +107,7 @@ public class LayerService extends Service {
 
                 int count = 0;
                 long start = System.currentTimeMillis();
+                int previousMoveX = 1;
                 while(mThreadFlag) {
                     long end = System.currentTimeMillis();
                     long elapsedTime = end - start;
@@ -121,16 +126,33 @@ public class LayerService extends Service {
                                 continue;
                             }
 
-
-                            Point displaySize = getDisplaySize();
-                            if(mParams.x < -displaySize.x/2 || mParams.x > displaySize.x/2) {
+                            if(mParams.x < -mDisplaySize.x/2 || mParams.x > mDisplaySize.x/2) {
                                 mMoveX = -mMoveX;
                             }
-                            if(mParams.y < -displaySize.y/2 || mParams.y > displaySize.y/2){
+                            if(mParams.y < -mDisplaySize.y/2 || mParams.y > mDisplaySize.y/2){
                                 mMoveY = -mMoveY;
+                            }
+
+                            // set left or right image
+                            if(mMoveX < 0){
+                                handlerForMove.post(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_l);
+                                    }
+                                });
+                            }
+                            else{
+                                handlerForMove.post(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        mCharacterImageView.setImageResource(R.drawable.robot_head_b_mini_r);
+                                    }
+                                });
                             }
                             mParams.x += mMoveX;
                             mParams.y += mMoveY;
+                            //Log.d(LOG_TAG, String.valueOf(mParams.x) + ", " + String.valueOf(mParams.y));
 
                             handlerForMove.post(new Runnable() {
                                 @Override

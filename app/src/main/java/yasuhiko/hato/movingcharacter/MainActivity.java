@@ -1,12 +1,14 @@
 package yasuhiko.hato.movingcharacter;
 
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
@@ -16,6 +18,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.overlay);
+        Consts.mImageView = (ImageView)findViewById(R.id.robot);
 
         //setContentView(new CustomView(this));
         setContentView(R.layout.activity_main);
