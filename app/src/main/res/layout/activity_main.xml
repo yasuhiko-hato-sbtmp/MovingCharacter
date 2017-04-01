@@ -13,4 +13,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/presence_switch"/>
 
+<!--
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/robot"
+        android:src="@drawable/robot_b_r"/>
+        -->
 </LinearLayout>
