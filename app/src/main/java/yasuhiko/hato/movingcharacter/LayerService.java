@@ -4,6 +4,8 @@ package yasuhiko.hato.movingcharacter;
 import android.animation.Animator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +31,7 @@ import android.view.ViewTreeObserver;
  */
 public class LayerService extends Service {
     private final String LOG_TAG = "LayerService";
+    private static boolean mStarted = false;
     private View mView;
     private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener;
     private Point mDisplaySize;
@@ -56,10 +59,28 @@ public class LayerService extends Service {
     }
 
 
+    public static boolean isStarted(){
+        return mStarted;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(LOG_TAG, "Start " + LOG_TAG);
         super.onStartCommand(intent, flags, startId);
+
+
+        // For foreground
+        mStarted = true;
+        Intent activityIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle("Moving Character")
+                .setContentText("")
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.robot_head_b_mini_l)
+                .build();
+        startForeground(startId, notification);
+
 
         mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         mDisplaySize = getDisplaySize();
@@ -186,12 +207,14 @@ public class LayerService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d(LOG_TAG, "onDestory()");
         super.onDestroy();
         if(mValueAnimator != null) {
             mValueAnimator.end();
         }
         mWindowManager.removeView(mView);
         mThreadFlag = false;
+        mStarted = false;
     }
 
     private Point getDisplaySize(){

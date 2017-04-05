@@ -3,14 +3,11 @@ package yasuhiko.hato.movingcharacter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -38,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     // stop moving
-                    stopService(new Intent(MainActivity.this, LayerService.class));
+                    if(LayerService.isStarted()) {
+                        stopService(new Intent(MainActivity.this, LayerService.class));
+                    }
                 }
             }
         });
@@ -114,11 +113,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_OVERLAY_CODE);
             }
             else{
-                startService(new Intent(MainActivity.this, LayerService.class));
+                if(!LayerService.isStarted()) {
+                    startService(new Intent(MainActivity.this, LayerService.class));
+                }
             }
         }
         else {
-            startService(new Intent(MainActivity.this, LayerService.class));
+            if(!LayerService.isStarted()) {
+                startService(new Intent(MainActivity.this, LayerService.class));
+            }
         }
     }
 
