@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,6 +49,7 @@ public class LayerService extends Service {
     final Handler mHandlerForMove = new Handler();
     private ValueAnimator mValueAnimator;
     private Runnable mMovingViewRunnable;
+    private GestureDetector mGestureDetector;
 
     public LayerService() {
     }
@@ -114,21 +116,41 @@ public class LayerService extends Service {
         mView.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
 
 
-        mView.setOnTouchListener(new View.OnTouchListener() {
+        mGestureDetector = new GestureDetector(mView.getContext(), new GestureDetector.OnGestureListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.d(LOG_TAG, motionEvent.toString());
+            public boolean onDown(MotionEvent motionEvent) {
+                Log.d(LOG_TAG, "GD.onDown() " + motionEvent.toString());
+                return false;
+            }
 
-                int x = (int)motionEvent.getRawX();
-                int y = (int)motionEvent.getRawY();
-                int action = motionEvent.getAction();
+            @Override
+            public void onShowPress(MotionEvent motionEvent) {
+                Log.d(LOG_TAG, "GD.onShowPress() " + motionEvent.toString());
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent motionEvent) {
+                Log.d(LOG_TAG, "GD.onSingleTapUp() " + motionEvent.toString());
+                if (mValueAnimator != null && mValueAnimator.isRunning()) {
+                    mValueAnimator.pause();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                Log.d(LOG_TAG, "GD.onScroll() " + motionEvent1.toString());
+                int action = motionEvent1.getAction();
+                int x = (int) motionEvent1.getRawX();
+                int y = (int) motionEvent1.getRawY();
 
                 if(action == MotionEvent.ACTION_MOVE) {
-                    if(mValueAnimator != null && mValueAnimator.isRunning()){
-                        mValueAnimator.end();
+                    if (mValueAnimator != null && mValueAnimator.isRunning()) {
+                        mValueAnimator.pause();
                     }
-                    changeImageViewImage(R.drawable.robot_b_u);
-
+                    if(!mIsDragged) {
+                        changeImageViewImage(R.drawable.robot_b_u);
+                    }
                     int centerX = x - (mDisplaySize.x / 2);
                     int centerY = y - (mDisplaySize.y / 2);
 
@@ -136,10 +158,59 @@ public class LayerService extends Service {
                     mParams.y = centerY;
 
                     mWindowManager.updateViewLayout(mView, mParams);
+                    mIsDragged = true;
                 }
-                else if(action == MotionEvent.ACTION_UP) {
+                else if (action == MotionEvent.ACTION_UP) {
                     changeImageViewImage(R.drawable.robot_b_l);
+                    mIsDragged = false;
                 }
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent motionEvent) {
+                Log.d(LOG_TAG, "GD.onLongPress() " + motionEvent.toString());
+            }
+
+            @Override
+            public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                Log.d(LOG_TAG, "GD.onFling() " + motionEvent1.toString());
+                return false;
+            }
+        });
+
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                //Log.d(LOG_TAG, motionEvent.toString());
+
+//                int x = (int) motionEvent.getRawX();
+//                int y = (int) motionEvent.getRawY();
+                int action = motionEvent.getAction();
+
+                mGestureDetector.onTouchEvent(motionEvent);
+                if(mIsDragged && action == MotionEvent.ACTION_UP){
+                    changeImageViewImage(R.drawable.robot_b_l);
+                    mIsDragged = false;
+                }
+
+//                if (action == MotionEvent.ACTION_MOVE) {
+//                    if (mValueAnimator != null && mValueAnimator.isRunning()) {
+//                        mValueAnimator.end();
+//                    }
+//                    changeImageViewImage(R.drawable.robot_b_u);
+//
+//                    int centerX = x - (mDisplaySize.x / 2);
+//                    int centerY = y - (mDisplaySize.y / 2);
+//
+//                    mParams.x = centerX;
+//                    mParams.y = centerY;
+//
+//                    mWindowManager.updateViewLayout(mView, mParams);
+//                } else if (action == MotionEvent.ACTION_UP) {
+//                    changeImageViewImage(R.drawable.robot_b_l);
+//                }
+
                 return false;
             }
         });
