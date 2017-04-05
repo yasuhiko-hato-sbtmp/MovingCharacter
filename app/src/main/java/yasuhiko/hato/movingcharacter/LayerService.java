@@ -226,24 +226,27 @@ public class LayerService extends Service {
 
 
     private ValueAnimator setAnimation(Point source, Point displaySize, Point viewSize){
-        int currentQuadrant = whichQuadrantInCenterCoordinateSys(source);
+//        int currentQuadrant = whichQuadrantInCenterCoordinateSys(source);
+//
+//        float toX = (float)(Math.random() * (displaySize.x / 2 - viewSize.x / 2));
+//        float toY = (float)(Math.random() * (displaySize.y / 2 - viewSize.y / 2));
+//        int nextQuadrant = (int)(Math.random() * 4) + 1;
+//        if(nextQuadrant == 1){
+//
+//        }
+//        else if(nextQuadrant == 2){
+//            toY = -toY;
+//        }
+//        else if(nextQuadrant == 3){
+//            toX = -toX;
+//            toY = -toY;
+//        }
+//        else{
+//            toX = -toX;
+//        }
 
-        float toX = (float)(Math.random() * (displaySize.x / 2 - viewSize.x / 2));
-        float toY = (float)(Math.random() * (displaySize.y / 2 - viewSize.y / 2));
-        int nextQuadrant = (int)(Math.random() * 4) + 1;
-        if(nextQuadrant == 1){
-
-        }
-        else if(nextQuadrant == 2){
-            toY = -toY;
-        }
-        else if(nextQuadrant == 3){
-            toX = -toX;
-            toY = -toY;
-        }
-        else{
-            toX = -toX;
-        }
+        float toX = (float)(Math.random() * (displaySize.x - viewSize.x) - (displaySize.x/2 - viewSize.x/2));
+        float toY = (float)(Math.random() * (displaySize.y - viewSize.y) - (displaySize.y/2 - viewSize.y/2));
 
         if(toX > source.x){
             changeImageViewImage(R.drawable.robot_b_r);
@@ -258,7 +261,8 @@ public class LayerService extends Service {
         valueAnimator.setDuration((long)TRAVELING_TIME_MILLI_SEC);
         valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
-        Log.d(LOG_TAG, "Move: " + String.valueOf(currentQuadrant) + "(" + String.valueOf(source.x) + ", " + String.valueOf(source.y) + ") -> " + String.valueOf(nextQuadrant) + "(" + String.valueOf(toX) + ", " + String.valueOf(toY) + ")");
+        //Log.d(LOG_TAG, "Move: " + String.valueOf(currentQuadrant) + "(" + String.valueOf(source.x) + ", " + String.valueOf(source.y) + ") -> " + String.valueOf(nextQuadrant) + "(" + String.valueOf(toX) + ", " + String.valueOf(toY) + ")");
+        Log.d(LOG_TAG, "Move: " + "(" + String.valueOf(source.x) + ", " + String.valueOf(source.y) + ") -> " + "(" + String.valueOf(toX) + ", " + String.valueOf(toY) + ")");
         return valueAnimator;
     }
 
