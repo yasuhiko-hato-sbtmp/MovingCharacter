@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">MovingCharacter</string>
+
+
+    <!-- For preferences -->
+    <string name="preference_category_character">Character Settings</string>
+    <string name="preference_title_show_character">Show the character</string>
+    <string name="preference_title_move">Character movement</string>
+
+    <string name="preference_category_permissions">Permissions</string>
+    <string name="preference_title_location">Location use</string>
+
 </resources>

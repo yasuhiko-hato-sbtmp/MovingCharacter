@@ -73,7 +73,8 @@ public class LayerService extends Service {
 
         // For foreground
         mStarted = true;
-        Intent activityIntent = new Intent(this, MainActivity.class);
+        Intent activityIntent = new Intent(this, SettingsActivity.class);
+        //activityIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP); // to call already existing activity
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
         Notification notification = new Notification.Builder(this)
                 .setContentTitle("Moving Character")
@@ -160,7 +161,7 @@ public class LayerService extends Service {
                     mWindowManager.updateViewLayout(mView, mParams);
                     mIsDragged = true;
                 }
-                else if (action == MotionEvent.ACTION_UP) {
+                else if (action == MotionEvent.ACTION_UP) { // never called here
                     changeImageViewImage(R.drawable.robot_b_l);
                     mIsDragged = false;
                 }
