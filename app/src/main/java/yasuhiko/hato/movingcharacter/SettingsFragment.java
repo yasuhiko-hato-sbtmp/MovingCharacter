@@ -1,12 +1,16 @@
 package yasuhiko.hato.movingcharacter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
@@ -25,6 +29,7 @@ public class SettingsFragment extends PreferenceFragment {
     public static final String KEY_PREF_SHOW_CHARACTER = "ShowCharacter";
     private SharedPreferences.OnSharedPreferenceChangeListener mListener;
 
+    private int REQUEST_OVERLAY_CODE = 100;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -35,8 +40,20 @@ public class SettingsFragment extends PreferenceFragment {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if(key.equals(KEY_PREF_SHOW_CHARACTER)){
-                    SwitchPreference switchPreference = (SwitchPreference)findPreference(key);
-                    Log.d(LOG_TAG, "\"" + switchPreference.toString() + "\" was changed");
+                    //SwitchPreference switchPreference = (SwitchPreference)findPreference(key);
+                    //Log.d(LOG_TAG, "\"" + switchPreference.toString() + "\" was changed");
+                    boolean b = sharedPreferences.getBoolean(KEY_PREF_SHOW_CHARACTER, false);
+                    if(b){
+                        // start moving
+                        checkCanDrawOverlaysAndStartMoving();
+                    }
+                    else{
+                        // stop moving
+                        if(LayerService.isStarted()) {
+                            Activity activity = getActivity();
+                            activity.stopService(new Intent(activity, LayerService.class));
+                        }
+                    }
                 }
             }
         };
@@ -55,5 +72,37 @@ public class SettingsFragment extends PreferenceFragment {
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(mListener);
     }
+
+    private void checkCanDrawOverlaysAndStartMoving(){
+        Activity activity = getActivity();
+        if(Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(activity)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + activity.getPackageName()));
+                startActivityForResult(intent, REQUEST_OVERLAY_CODE);
+            }
+            else{
+                if(!LayerService.isStarted()) {
+                    activity.startService(new Intent(activity, LayerService.class));
+                }
+            }
+        }
+        else {
+            if(!LayerService.isStarted()) {
+                activity.startService(new Intent(activity, LayerService.class));
+            }
+        }
+    }
+
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if(requestCode == REQUEST_OVERLAY_CODE){
+//            checkCanDrawOverlaysAndStartMoving();
+//        }
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
+
+
 
 }
