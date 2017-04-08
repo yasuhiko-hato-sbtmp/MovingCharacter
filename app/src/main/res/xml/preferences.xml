@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/preference_category_character">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="ShowCharacter"
+            android:title="@string/preference_title_show_character"
+            android:summary="" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="Move"
+            android:title="@string/preference_title_move"
+            android:summary="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/preference_category_permissions">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="Location"
+            android:title="@string/preference_title_location"
+            android:summary="" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
