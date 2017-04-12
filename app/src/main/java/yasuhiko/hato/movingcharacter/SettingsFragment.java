@@ -1,22 +1,13 @@
 package yasuhiko.hato.movingcharacter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 
 /**
@@ -95,13 +86,13 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == REQUEST_OVERLAY_CODE){
-//            checkCanDrawOverlaysAndStartMoving();
-//        }
-//        super.onActivityResult(requestCode, resultCode, data);
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_OVERLAY_CODE){
+            checkCanDrawOverlaysAndStartMoving();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
 
 

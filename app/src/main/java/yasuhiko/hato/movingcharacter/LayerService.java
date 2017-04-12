@@ -80,7 +80,7 @@ public class LayerService extends Service {
                 .setContentTitle("Moving Character")
                 .setContentText("")
                 .setContentIntent(pendingIntent)
-                .setSmallIcon(R.drawable.robot_head_b_mini_l)
+                .setSmallIcon(R.drawable.ic_stat)
                 .build();
         startForeground(startId, notification);
 
