@@ -2,7 +2,7 @@
 <resources>
     <array name="entry_frequency">
         <item>@string/preference_frequency_sometimes</item>
-        <item>@string/preference_frequency_normal</item>
+        <item>@string/preference_frequency_standard</item>
         <item>@string/preference_frequency_frequently</item>
     </array>
 

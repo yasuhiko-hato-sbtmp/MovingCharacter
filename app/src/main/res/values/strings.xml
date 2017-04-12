@@ -14,7 +14,7 @@
     <string name="preference_key_color">CharacterColor</string>
     <string name="preference_title_color">Character color</string>
     <string name="preference_color_blue">Blue</string>
-    <string name="preference_color_red">Ref</string>
+    <string name="preference_color_red">Red</string>
 
     <!-- Character movement -->
     <string name="preference_key_move">Move</string>
@@ -25,7 +25,7 @@
     <string name="preference_key_frequency">Frequency</string>
     <string name="preference_title_frequency">Frequency of movement</string>
     <string name="preference_frequency_sometimes">Sometimes</string>
-    <string name="preference_frequency_normal">Normal</string>
+    <string name="preference_frequency_standard">Standard</string>
     <string name="preference_frequency_frequently">Frequently</string>
 
 
