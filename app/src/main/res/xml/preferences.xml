@@ -5,21 +5,33 @@
         android:title="@string/preference_category_character">
         <SwitchPreference
             android:defaultValue="false"
-            android:key="ShowCharacter"
+            android:key="@string/preference_key_show_character"
             android:title="@string/preference_title_show_character"
             android:summary="@string/preference_summary_show_character" />
+        <ListPreference
+            android:key="@string/preference_key_color"
+            android:title="@string/preference_title_color"
+            android:summary="%s"
+            android:entries="@array/entry_color"
+            android:entryValues="@array/entry_frequency_values" />
         <SwitchPreference
             android:defaultValue="true"
-            android:key="Move"
+            android:key="@string/preference_key_move"
             android:title="@string/preference_title_move"
-            android:summary="" />
+            android:summary="@string/preference_summary_move" />
+        <ListPreference
+            android:key="@string/preference_key_frequency"
+            android:title="@string/preference_title_frequency"
+            android:summary="%s"
+            android:entries="@array/entry_frequency"
+            android:entryValues="@array/entry_frequency_values"/>
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/preference_category_permissions">
         <SwitchPreference
             android:defaultValue="false"
-            android:key="Location"
+            android:key="@string/preference_key_location"
             android:title="@string/preference_title_location"
             android:summary="" />
     </PreferenceCategory>

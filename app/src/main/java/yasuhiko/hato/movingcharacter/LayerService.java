@@ -42,7 +42,7 @@ public class LayerService extends Service {
     private boolean mIsDragged = false;
     private float mMoveX = 1;
     private float mMoveY = 1;
-    private float TRAVELING_TIME_MILLI_SEC = 3000;
+    private final float TRAVELING_TIME_MILLI_SEC = 3000;
     private float STOP_TIME_MILLI_SEC = 5000;
     private ImageView mCharacterImageView;
     private Point mImageViewSize;
@@ -77,8 +77,8 @@ public class LayerService extends Service {
         //activityIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP); // to call already existing activity
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
         Notification notification = new Notification.Builder(this)
-                .setContentTitle("Moving Character")
-                .setContentText("")
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.notification_description))
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.ic_stat)
                 .build();

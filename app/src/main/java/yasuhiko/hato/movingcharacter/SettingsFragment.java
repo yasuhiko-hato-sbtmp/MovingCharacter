@@ -17,7 +17,6 @@ import android.provider.Settings;
 public class SettingsFragment extends PreferenceFragment {
 
     private final String LOG_TAG = "SettingsFragment";
-    public static final String KEY_PREF_SHOW_CHARACTER = "ShowCharacter";
     private SharedPreferences.OnSharedPreferenceChangeListener mListener;
 
     private int REQUEST_OVERLAY_CODE = 100;
@@ -30,10 +29,10 @@ public class SettingsFragment extends PreferenceFragment {
         mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if(key.equals(KEY_PREF_SHOW_CHARACTER)){
-                    //SwitchPreference switchPreference = (SwitchPreference)findPreference(key);
-                    //Log.d(LOG_TAG, "\"" + switchPreference.toString() + "\" was changed");
-                    boolean b = sharedPreferences.getBoolean(KEY_PREF_SHOW_CHARACTER, false);
+
+                // Show character
+                if(key.equals(getString(R.string.preference_key_show_character))){
+                    boolean b = sharedPreferences.getBoolean(getString(R.string.preference_key_show_character), false);
                     if(b){
                         // start moving
                         checkCanDrawOverlaysAndStartMoving();

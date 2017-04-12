@@ -1,14 +1,38 @@
 <resources>
     <string name="app_name">MovingCharacter</string>
-
+    <string name="notification_description">Show settings</string>
 
     <!-- For preferences -->
     <string name="preference_category_character">Character Settings</string>
+
+    <!-- Show character -->
+    <string name="preference_key_show_character">ShowCharacter</string>
     <string name="preference_title_show_character">Show the character</string>
     <string name="preference_summary_show_character">Show the character on the Home screen.</string>
+
+    <!-- Color -->
+    <string name="preference_key_color">CharacterColor</string>
+    <string name="preference_title_color">Character color</string>
+    <string name="preference_color_blue">Blue</string>
+    <string name="preference_color_red">Ref</string>
+
+    <!-- Character movement -->
+    <string name="preference_key_move">Move</string>
     <string name="preference_title_move">Character movement</string>
+    <string name="preference_summary_move">Enable/disable character movement</string>
+
+    <!-- Frequency of movement -->
+    <string name="preference_key_frequency">Frequency</string>
+    <string name="preference_title_frequency">Frequency of movement</string>
+    <string name="preference_frequency_sometimes">Sometimes</string>
+    <string name="preference_frequency_normal">Normal</string>
+    <string name="preference_frequency_frequently">Frequently</string>
+
 
     <string name="preference_category_permissions">Permissions</string>
+
+    <!-- Location use -->
+    <string name="preference_key_location">Location</string>
     <string name="preference_title_location">Location use</string>
 
 </resources>
