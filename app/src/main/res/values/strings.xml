@@ -8,7 +8,7 @@
     <!-- Show character -->
     <string name="preference_key_show_character">ShowCharacter</string>
     <string name="preference_title_show_character">Show the character</string>
-    <string name="preference_summary_show_character">Show the character on the Home screen.</string>
+    <string name="preference_summary_show_character">Show the character on the Home screen</string>
 
     <!-- Color -->
     <string name="preference_key_color">CharacterColor</string>

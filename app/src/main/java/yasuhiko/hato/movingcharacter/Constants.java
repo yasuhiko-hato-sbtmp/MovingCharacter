@@ -5,38 +5,23 @@ package yasuhiko.hato.movingcharacter;
  */
 
 public class Constants {
-    private int imageL;
-    private int imageR;
-    private int imageU;
+    public static int imageL;
+    public static int imageR;
+    public static int imageU;
 
-    private int imageNotification;
-
-
-    public int getImageL(){
-        return imageL;
-    }
-    public void setImageL(int id){
-        imageL = id;
+    public Constants(){
+        changeImageToBlue();
     }
 
-    public int getImageR(){
-        return imageR;
-    }
-    public void setImageR(int id){
-        imageR = id;
-    }
-
-    public int getImageU(){
-        return imageU;
-    }
-    public void setImageU(int id){
-        imageU = id;
+    public static void changeImageToBlue(){
+        imageL = R.drawable.robot_b_l;
+        imageR = R.drawable.robot_b_r;
+        imageU = R.drawable.robot_b_u;
     }
 
-    public int getImageNotification(){
-        return imageNotification;
-    }
-    public void setImageNotification(int id){
-        imageNotification = id;
+    public static void changeImageToRed(){
+        imageL = R.drawable.robot_r_l;
+        imageR = R.drawable.robot_r_r;
+        imageU = R.drawable.robot_r_u;
     }
 }

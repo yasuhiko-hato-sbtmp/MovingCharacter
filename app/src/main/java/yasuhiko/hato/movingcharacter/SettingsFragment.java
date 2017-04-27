@@ -6,8 +6,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Log;
 
 
 /**
@@ -26,6 +30,29 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
+        // for initial launch
+        ListPreference listPreference = (ListPreference) findPreference(getString(R.string.preference_key_color));
+        if(listPreference.getValue()==null) {
+            // to ensure we don't get a null value
+            // set first value by default
+            String defaultValue = "Blue";
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.preference_key_color), defaultValue);
+            listPreference.setValue(defaultValue);
+        }
+        Log.d(LOG_TAG, "color: " + listPreference.getValue());
+
+        listPreference = (ListPreference) findPreference(getString(R.string.preference_key_frequency));
+        if(listPreference.getValue()==null) {
+            // to ensure we don't get a null value
+            // set first value by default
+            String defaultValue = "Standard";
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.preference_key_frequency), defaultValue);
+            listPreference.setValue(defaultValue);
+        }
+        Log.d(LOG_TAG, "frequency: " + listPreference.getValue());
+
+
+
         mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -43,6 +70,17 @@ public class SettingsFragment extends PreferenceFragment {
                             Activity activity = getActivity();
                             activity.stopService(new Intent(activity, LayerService.class));
                         }
+                    }
+                }
+                else if(key.equals(getString(R.string.preference_key_color))){
+                    int id = Integer.parseInt(sharedPreferences.getString(getString(R.string.preference_key_color), "0"));
+                    Log.d(LOG_TAG, "Changed color id to " + String.valueOf(id));
+                    if(id == 0){
+                        Constants.changeImageToBlue();
+                    }
+                    else if(id == 1){
+                        Constants.changeImageToRed();
+                        Activity activity = getActivity();
                     }
                 }
             }
