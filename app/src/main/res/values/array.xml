@@ -3,12 +3,12 @@
     <!-- Character color -->
     <array name="entry_color">
         <item>@string/preference_color_blue</item>
-        <!--<item>@string/preference_color_red</item>-->
+        <item>@string/preference_color_red</item>
     </array>
 
     <string-array name="entry_color_values">
         <item>0</item>
-        <!--<item>1</item>-->
+        <item>1</item>
     </string-array>
 
 

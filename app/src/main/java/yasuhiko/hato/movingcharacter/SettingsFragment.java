@@ -31,25 +31,25 @@ public class SettingsFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
 
         // for initial launch
-        ListPreference listPreference = (ListPreference) findPreference(getString(R.string.preference_key_color));
-        if(listPreference.getValue()==null) {
+        ListPreference lpForColor = (ListPreference) findPreference(getString(R.string.preference_key_color));
+        if(lpForColor.getValue()==null) {
             // to ensure we don't get a null value
             // set first value by default
             String defaultValue = "Blue";
             PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.preference_key_color), defaultValue);
-            listPreference.setValue(defaultValue);
+            lpForColor.setValue(defaultValue);
         }
-        Log.d(LOG_TAG, "color: " + listPreference.getValue());
+        Log.d(LOG_TAG, "color: " + lpForColor.getValue());
 
-        listPreference = (ListPreference) findPreference(getString(R.string.preference_key_frequency));
-        if(listPreference.getValue()==null) {
+        ListPreference lpForFrequency = (ListPreference) findPreference(getString(R.string.preference_key_frequency));
+        if(lpForFrequency.getValue()==null) {
             // to ensure we don't get a null value
             // set first value by default
             String defaultValue = "Standard";
             PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.preference_key_frequency), defaultValue);
-            listPreference.setValue(defaultValue);
+            lpForFrequency.setValue(defaultValue);
         }
-        Log.d(LOG_TAG, "frequency: " + listPreference.getValue());
+        Log.d(LOG_TAG, "frequency: " + lpForFrequency.getValue());
 
 
 
@@ -80,7 +80,23 @@ public class SettingsFragment extends PreferenceFragment {
                     }
                     else if(id == 1){
                         Constants.changeImageToRed();
-                        Activity activity = getActivity();
+                    }
+                }
+                else if(key.equals(getString(R.string.preference_key_move))){
+                    boolean b = sharedPreferences.getBoolean(getString(R.string.preference_key_move), true);
+                    Constants.move = b;
+                }
+                else if(key.equals(getString(R.string.preference_key_frequency))){
+                    int id = Integer.parseInt((sharedPreferences.getString(getString(R.string.preference_key_frequency), "1")));
+                    Log.d(LOG_TAG, "Changed color id to " + String.valueOf(id));
+                    if(id == 0){
+                        Constants.changeMovingTimeIntervalToFrequently();
+                    }
+                    else if(id == 1){
+                        Constants.changeMovingTimeIntervalToStandard();
+                    }
+                    else if(id == 2){
+                        Constants.changeMovingTimeIntervalToSometimes();
                     }
                 }
             }
@@ -100,6 +116,7 @@ public class SettingsFragment extends PreferenceFragment {
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(mListener);
     }
+
 
     private void checkCanDrawOverlaysAndStartMoving(){
         Activity activity = getActivity();

@@ -238,13 +238,16 @@ public class LayerService extends Service {
 
                         }
                     });
-                    mValueAnimator.start();
-                    mHandlerForMove.postDelayed(mMovingViewRunnable, (long)(STOP_TIME_MILLI_SEC + TRAVELING_TIME_MILLI_SEC));
+                    if(Constants.move) {
+                        mValueAnimator.start();
+                    }
+                    //mHandlerForMove.postDelayed(mMovingViewRunnable, (long) (STOP_TIME_MILLI_SEC + TRAVELING_TIME_MILLI_SEC));
+                    mHandlerForMove.postDelayed(mMovingViewRunnable, (long) (Constants.movingTimeIntervalMilliSec + TRAVELING_TIME_MILLI_SEC));
                 }
             }
         };
-        mHandlerForMove.postDelayed(mMovingViewRunnable, (long)STOP_TIME_MILLI_SEC);
-
+        //mHandlerForMove.postDelayed(mMovingViewRunnable, (long) STOP_TIME_MILLI_SEC);
+        mHandlerForMove.postDelayed(mMovingViewRunnable, Constants.movingTimeIntervalMilliSec);
 
 
         //return START_STICKY; // If we get killed, after returning from here, restart
