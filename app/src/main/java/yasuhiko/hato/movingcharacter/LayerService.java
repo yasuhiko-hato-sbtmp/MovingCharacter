@@ -5,15 +5,19 @@ import android.animation.Animator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -44,7 +48,7 @@ public class LayerService extends Service {
     private float STOP_TIME_MILLI_SEC = 5000;
     private ImageView mCharacterImageView;
     private Point mImageViewSize;
-    final Handler mHandlerForMove = new Handler();
+    final Handler mHandlerForMove = new Handler(Looper.getMainLooper());
     private ValueAnimator mValueAnimator;
     private Runnable mMovingViewRunnable;
     private GestureDetector mGestureDetector;
@@ -72,25 +76,57 @@ public class LayerService extends Service {
         // For foreground
         mStarted = true;
         Intent activityIntent = new Intent(this, SettingsActivity.class);
-        //activityIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP); // to call already existing activity
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
-        Notification notification = new Notification.Builder(this)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.notification_description))
-                .setContentIntent(pendingIntent)
-                .setSmallIcon(R.drawable.ic_stat)
-                .build();
-        startForeground(startId, notification);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, 
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
+        
+        String channelId = "moving_character_channel";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId, "Moving Character", NotificationManager.IMPORTANCE_LOW);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+
+        Notification notification;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notification = new Notification.Builder(this, channelId)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.notification_description))
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.drawable.ic_stat)
+                    .build();
+        } else {
+            notification = new Notification.Builder(this)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.notification_description))
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.drawable.ic_stat)
+                    .build();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(startId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        } else {
+            startForeground(startId, notification);
+        }
 
 
         mWindowManager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         mDisplaySize = getDisplaySize();
         Log.d(LOG_TAG, "DisplaySize: " + String.valueOf(mDisplaySize.x) + " x " + String.valueOf(mDisplaySize.y));
 
+        int layoutType;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            layoutType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            layoutType = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        }
+
         mParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, // If TYPE_SYSTEM_OVERLAY, cannot be moved
+                layoutType,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                         WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
                         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
@@ -261,16 +297,23 @@ public class LayerService extends Service {
         if(mValueAnimator != null) {
             mValueAnimator.end();
         }
-        mWindowManager.removeView(mView);
+        if (mView != null) {
+            mWindowManager.removeView(mView);
+        }
         mThreadFlag = false;
         mStarted = false;
     }
 
     private Point getDisplaySize(){
-        Display display = mWindowManager.getDefaultDisplay();
-        Point point = new Point();
-        display.getSize(point);
-        return point;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return new Point(mWindowManager.getCurrentWindowMetrics().getBounds().width(), 
+                             mWindowManager.getCurrentWindowMetrics().getBounds().height());
+        } else {
+            Display display = mWindowManager.getDefaultDisplay();
+            Point point = new Point();
+            display.getSize(point);
+            return point;
+        }
     }
 
 
