@@ -6,19 +6,21 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 
 /**
  * @author Yasuhikohato
  * @since 4/8, 2017
  */
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragmentCompat {
 
     private final String LOG_TAG = "SettingsFragment";
     private SharedPreferences.OnSharedPreferenceChangeListener mListener;
@@ -26,32 +28,21 @@ public class SettingsFragment extends PreferenceFragment {
     private int REQUEST_OVERLAY_CODE = 100;
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.preferences, rootKey);
 
         // for initial launch
-        ListPreference lpForColor = (ListPreference) findPreference(getString(R.string.preference_key_color));
-        if(lpForColor.getValue()==null) {
-            // to ensure we don't get a null value
-            // set first value by default
-            String defaultValue = "Blue";
-            PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.preference_key_color), defaultValue);
+        ListPreference lpForColor = findPreference(getString(R.string.preference_key_color));
+        if(lpForColor != null && lpForColor.getValue()==null) {
+            String defaultValue = "0"; // Changed from "Blue" to "0" assuming it's the index or value in XML
             lpForColor.setValue(defaultValue);
         }
-        Log.d(LOG_TAG, "color: " + lpForColor.getValue());
 
-        ListPreference lpForFrequency = (ListPreference) findPreference(getString(R.string.preference_key_frequency));
-        if(lpForFrequency.getValue()==null) {
-            // to ensure we don't get a null value
-            // set first value by default
-            String defaultValue = "Standard";
-            PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.preference_key_frequency), defaultValue);
+        ListPreference lpForFrequency = findPreference(getString(R.string.preference_key_frequency));
+        if(lpForFrequency != null && lpForFrequency.getValue()==null) {
+            String defaultValue = "1"; // Standard
             lpForFrequency.setValue(defaultValue);
         }
-        Log.d(LOG_TAG, "frequency: " + lpForFrequency.getValue());
-
-
 
         mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -68,12 +59,15 @@ public class SettingsFragment extends PreferenceFragment {
                         // stop moving
                         if(LayerService.isStarted()) {
                             Activity activity = getActivity();
-                            activity.stopService(new Intent(activity, LayerService.class));
+                            if (activity != null) {
+                                activity.stopService(new Intent(activity, LayerService.class));
+                            }
                         }
                     }
                 }
                 else if(key.equals(getString(R.string.preference_key_color))){
-                    int id = Integer.parseInt(sharedPreferences.getString(getString(R.string.preference_key_color), "0"));
+                    String value = sharedPreferences.getString(getString(R.string.preference_key_color), "0");
+                    int id = Integer.parseInt(value);
                     Log.d(LOG_TAG, "Changed color id to " + String.valueOf(id));
                     if(id == 0){
                         Constants.changeImageToBlue();
@@ -87,8 +81,9 @@ public class SettingsFragment extends PreferenceFragment {
                     Constants.move = b;
                 }
                 else if(key.equals(getString(R.string.preference_key_frequency))){
-                    int id = Integer.parseInt((sharedPreferences.getString(getString(R.string.preference_key_frequency), "1")));
-                    Log.d(LOG_TAG, "Changed color id to " + String.valueOf(id));
+                    String value = sharedPreferences.getString(getString(R.string.preference_key_frequency), "1");
+                    int id = Integer.parseInt(value);
+                    Log.d(LOG_TAG, "Changed frequency id to " + String.valueOf(id));
                     if(id == 0){
                         Constants.changeMovingTimeIntervalToFrequently();
                     }
@@ -120,6 +115,8 @@ public class SettingsFragment extends PreferenceFragment {
 
     private void checkCanDrawOverlaysAndStartMoving(){
         Activity activity = getActivity();
+        if (activity == null) return;
+
         if(Build.VERSION.SDK_INT >= 23) {
             if (!Settings.canDrawOverlays(activity)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -127,14 +124,21 @@ public class SettingsFragment extends PreferenceFragment {
                 startActivityForResult(intent, REQUEST_OVERLAY_CODE);
             }
             else{
-                if(!LayerService.isStarted()) {
-                    activity.startService(new Intent(activity, LayerService.class));
-                }
+                startLayerService(activity);
             }
         }
         else {
-            if(!LayerService.isStarted()) {
-                activity.startService(new Intent(activity, LayerService.class));
+            startLayerService(activity);
+        }
+    }
+
+    private void startLayerService(Activity activity) {
+        if(!LayerService.isStarted()) {
+            Intent intent = new Intent(activity, LayerService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                activity.startForegroundService(intent);
+            } else {
+                activity.startService(intent);
             }
         }
     }
