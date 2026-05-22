@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/Documents/AndroidStudioProjects/TechAcademy/MovingCharacter/MovingCharacter.iml" filepath="$USER_HOME$/Documents/AndroidStudioProjects/TechAcademy/MovingCharacter/MovingCharacter.iml" />
-      <module fileurl="file://$USER_HOME$/Documents/AndroidStudioProjects/TechAcademy/MovingCharacter/app/app.iml" filepath="$USER_HOME$/Documents/AndroidStudioProjects/TechAcademy/MovingCharacter/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MovingCharacter.iml" filepath="$PROJECT_DIR$/.idea/modules/MovingCharacter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/MovingCharacter.app.unitTest.iml" />
     </modules>
   </component>
 </project>
