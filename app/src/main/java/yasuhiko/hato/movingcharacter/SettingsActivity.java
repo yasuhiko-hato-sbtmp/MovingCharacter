@@ -1,25 +1,28 @@
 package yasuhiko.hato.movingcharacter;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class SettingsActivity extends AppCompatActivity {
     private final String LOG_TAG = "SettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
     }
-
 }
